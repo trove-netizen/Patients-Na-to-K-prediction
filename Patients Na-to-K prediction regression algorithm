@@ -1,0 +1,105 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import sklearn
+from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+import joblib
+from _tkinter import *
+drug=pd.read_csv('drug200.csv')
+drug
+sns.set
+plt.figure(figsize=(6,6))
+sns.countplot(drug['Sex'])
+plt.title('sex distribution')
+plt.show()
+
+sns.set
+plt.figure(figsize=(6,6))
+sns.countplot(drug['BP'])
+plt.title('sex distribution')
+plt.show()
+
+sns.set
+plt.figure(figsize=(6,6))
+sns.countplot(drug['Drug'])
+plt.title('sex distribution')
+plt.show()
+drug.replace({'Drug':{'drugB':1,'drugA':2,'drugX':3,'drugC':4,'DrugY':5}},inplace=True)
+drug.replace({'BP':{'HIGH':1,'NORMAL':2,'LOW':3}},inplace=True)
+drug.replace({'Cholesterol':{'HIGH':1,'NORMAL':2,'LOW':3}},inplace=True)
+drug.replace({'Sex':{'M':1,'F':2}},inplace=True)
+x=drug.drop(columns='Na_to_K',axis=1)
+y=drug['Na_to_K']
+x
+y
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.1,random_state=8)
+model_random=RandomForestRegressor()
+random=model_random.fit(x_train,y_train)
+model_extral=ExtraTreesRegressor()
+extral=model_extral.fit(x_train,y_train)
+model_decision=DecisionTreeRegressor()
+decision=model_decision.fit(x_train,y_train)
+model_linear=LinearRegression()
+linear=model_linear.fit(x_train,y_train)
+predict_random=random.predict(x_test)
+predict_extral=extral.predict(x_test)
+predict_decision=decision.predict(x_test)
+predict_linear=linear.predict(x_test)
+df1=pd.DataFrame({'actual':y_test, 'random':predict_random,'extral':predict_extral,'decision':predict_decision,'linear':predict_linear})
+df1
+plt.subplot(221)
+plt.plot(df1['actual'].iloc[0:11],label='Actual')
+plt.plot(df1['random'].iloc[0:11],label='random')
+plt.legend
+
+plt.subplot(222)
+plt.plot(df1['actual'].iloc[0:11],label='Actual')
+plt.plot(df1['extral'].iloc[0:11],label='extral')
+plt.legend
+
+
+plt.subplot(223)
+plt.plot(df1['actual'].iloc[0:11],label='Actual')
+plt.plot(df1['decision'].iloc[0:11],label='decision')
+plt.legend
+
+plt.subplot(224)
+plt.plot(df1['actual'].iloc[0:11],label='Actual')
+plt.plot(df1['linear'].iloc[0:11],label='linear')
+plt.legend
+
+random_r2=r2_score(y_test,predict_random)
+extral_r2=r2_score(y_test,predict_extral)
+decision_r2=r2_score(y_test,predict_decision)
+linear_r2=r2_score(y_test,predict_linear)
+print(random_r2,extral_r2,decision_r2,linear_r2)
+random_absolute=mean_absolute_error(y_test,predict_random)
+extral_absolute=mean_absolute_error(y_test,predict_extral)
+decision_absolute=mean_absolute_error(y_test,predict_decision)
+linear_absolute=mean_absolute_error(y_test,predict_linear)
+print(random_absolute,extral_absolute,decision_absolute,linear_absolute)
+random_square=mean_squared_error(y_test,predict_random)
+extral_square=mean_squared_error(y_test,predict_extral)
+decision_square=mean_squared_error(y_test,predict_decision)
+linear_square=mean_squared_error(y_test,predict_linear)
+print(random_square,extral_square,decision_square,linear_square)
+new={'Age':61,'Sex':2,'BP':3,'Cholesterol':1,'Drug':5}
+d = pd.DataFrame(new,index=[0])
+d
+new_pred = random.predict(d)
+print("Na_to_K for new customer is:",new_pred)
+drug
+joblib.dump(extral,'model_joblib_extral')
+joblib.dump(random,'model_joblib_random')
+joblib.dump(linear,'model_joblib_linear')
+joblib.dump(model_decision,'model_joblib_decision')
